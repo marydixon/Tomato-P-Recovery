@@ -1,0 +1,95 @@
+---
+title: "Olsen Phosphorus Concentration"
+author: "MD"
+date: "'r format(Sys.time(), '%b %d, %Y')'"
+output: 
+ html_document:
+   toc: true
+   toc_float: true
+   editor_options:
+   chunck_output_type: console
+   chunk_output_type: console
+---
+
+```{r}
+library(patchwork)
+library(tidyverse)
+library(emmeans)
+library(RColorBrewer)
+library(car)
+```
+
+# Read in Data
+
+```{r}
+op <- read.csv('Data/Inputs/Olsen_P.csv') %>% 
+  filter(!is.na(Olsen_P)) 
+```
+
+# Model Fitting
+
+```{r}
+par(mfrow=c(2,2))
+mod <- op %>% 
+  lm(Olsen_P ~ Fertilization*Domestication/Variety, data = .)
+plot(mod)
+outlierTest(mod)
+
+d  <- op[-c(235),]
+mod <- d %>% 
+  lm(Olsen_P ~ Fertilization*Domestication/Variety, data = .)
+plot(mod)
+
+aov.mod <- aov(mod)
+summary(aov.mod)
+
+e <- emmeans(mod, pairwise ~ Fertilization*Domestication)
+e.df <- as.data.frame(e$contrasts) %>% 
+  filter(., p.value < 0.05) 
+e.df
+e <- emmeans(mod, pairwise ~ Fertilization*Domestication*Variety)
+e.df <- as.data.frame(e$contrasts) %>% 
+  filter(., p.value < 0.05) 
+e.df
+```
+
+# Graph
+
+```{r}
+sum_op<-summarise(group_by(d,Variety,Domestication,Fertilization),
+  n = n(),
+  mean = mean(Olsen_P),
+  sd = sd(Olsen_P),
+  se = sd/sqrt(n))
+
+sum_op$letters <- c('cd','ab','bc','ab','ab','ab','cb','ab','d','ab','cd','ab','cd','ab','cd','ab','cd','ab','d','a','cd','b','cd','ab') #from emmeans contrasts above for Fertilization*Domestication*Variety
+
+level_order <- factor(sum_op$Variety,level = c('LA0716',  'LA1580', 'LA1698', 'LA1519', 'Matchless', 'B Pink', 'Marglobe', 'Rutgers','Bobcat','Quali T','Line 1','Line 2'))
+p<-ggplot(sum_op, aes(level_order, mean, fill = Domestication)) + 
+  geom_col(position = 'dodge') +
+  geom_text(aes(label = letters), vjust = -0.45, hjust = -0.28, size = 6) +
+  facet_wrap(~Fertilization, scales = 'free', ncol=1)+
+  labs(y='Olsen Phosphorus (mg/kg)')+
+  geom_errorbar(aes(ymin = mean-se, 
+                    ymax = mean+se),
+                position=position_dodge(0.9), width = .25)+
+  scale_fill_brewer(palette = 'Paired')+
+  theme(axis.text.x=element_text(size=14, colour = "black", angle = 90), 
+        axis.text.y=element_text(size=14, colour = "black"),
+        axis.title=element_text(size=16,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        strip.text.y = element_text(size=8, face="bold"), 
+        legend.position = 'none',
+        strip.text = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_blank());p
+
+
+ggsave(plot=p, filename = 'Data/Outputs/Figures/Figure3.pdf', width = 12, height = 10)
+
+```
+

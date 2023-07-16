@@ -1,0 +1,264 @@
+---
+title: "dbRDA"
+author: "MD"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: 
+ html_document:
+    toc: true
+    toc_float: true
+editor_options: 
+  chunk_output_type: console
+---
+
+
+
+```{r}
+library(pairwiseAdonis)
+library(RColorBrewer)
+library(patchwork)
+library(Polychrome)
+```
+
+```{r}
+P.rel <- readRDS('Data/Outputs/Intermediate_Data/Phyloseq.RelativeAbundance.RDS')
+
+P.rel <- subset_samples(P.rel, final >= 10000)
+
+
+P.modern <- subset_samples(P.rel, Domestication == 'Modern')
+P.trad <- subset_samples(P.rel, Domestication == 'Traditional')
+P.wild <- subset_samples(P.rel, Domestication == 'Wild')
+```
+
+```{r}
+d <- data.frame(sample_data(P.rel))
+
+d.modern <- data.frame(sample_data(P.modern))
+d.trad <- data.frame(sample_data(P.trad))
+d.wild <- data.frame(sample_data(P.wild))
+```
+
+
+```{r}
+data <- data.frame(t(otu_table(P.rel)))
+  names(data) <- tax_table(P.rel)[,'genus']
+  data <- sqrt(data) 
+
+data.modern <- data.frame(t(otu_table(P.modern)))
+  names(data.modern) <- tax_table(P.modern)[,'species']
+  data.modern <- sqrt(data.modern)  
+data.trad <- data.frame(t(otu_table(P.trad)))
+  names(data.trad) <- tax_table(P.trad)[,'species']
+  data.trad <- sqrt(data.trad)    
+data.wild <- data.frame(t(otu_table(P.wild)))
+  names(data.wild) <- tax_table(P.wild)[,'species']
+  data.wild <- sqrt(data.wild)
+```
+
+
+```{r}
+dist <- vegdist(data, method='bray')
+
+dist.modern <- vegdist(data.modern, method='bray')
+dist.trad <- vegdist(data.trad, method='bray')
+dist.wild <- vegdist(data.wild, method='bray')
+```
+
+# Model Fitting and Ordination
+
+## Full Dataset
+
+```{r}
+ord <- capscale(dist ~ Fertilization + Domestication/Variety + Fertilization*Domestication/Variety + Variety, data=d)
+sppscores(ord) <- data
+
+adonis2(dist ~ Fertilization + Domestication/Variety + Fertilization*Domestication/Variety + Variety, data=d, perm=999, by="terms") 
+pair.mod<-pairwise.adonis(dist,factors=d$Variety, p.adjust.m = "fdr")
+pair.mod 
+
+pair.mod<-pairwise.adonis(dist,factors=d$Domestication, p.adjust.m = "fdr")
+pair.mod
+
+pair.mod<-pairwise.adonis(dist,factors=d$Fertilization)
+pair.mod
+
+
+ev <- eigenvals(ord)
+Axis1_exp = round(ev[1] / sum(ev) * 100, 1)
+Axis2_exp = round(ev[2] / sum(ev) * 100, 1)
+axes <- as.data.frame(vegan::scores(ord, display="sites", choices=c(1:2)))
+names(axes) <- c("Axis1", "Axis2")
+axes <- cbind(d, axes) 
+
+
+axes$Variety <- factor(axes$Variety,level = c('LA0716', 'LA1519', 'LA1580','LA1698','B Pink', 'Marglobe', 'Matchless', 'Rutgers', 'Bobcat', 'Quali T','Line 1','Line 2'))
+
+p<-ggplot(data=axes, aes(x=Axis1, y=Axis2, fill=Variety, shape=Domestication)) +
+  geom_point(size=6) +
+  stat_ellipse(aes(group=Fertilization, color = Fertilization))+
+  scale_fill_brewer(palette = 'Paired')+
+  scale_color_manual(values = c('black','grey44'))+
+  scale_shape_manual(values=c(21,22,23)) +
+  guides(fill = guide_legend(
+    override.aes=list(shape = rep(21,2)))) +
+  labs(x=paste0('CAP1 (', Axis1_exp, '%)'), 
+       y=paste0('CAP2 (', Axis2_exp, '%)')) +
+   theme(axis.text=element_text(size=18, colour = "black"), 
+        axis.title=element_text(size=32,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        legend.key = element_blank(),
+        legend.text = element_text(size = 24),
+        legend.title = element_text(size = 24, face = 'bold'));p
+ggsave(plot=p, filename = 'Data/Outputs/Figures/SuppFigure1.pdf', width = 14, height = 10)
+```
+
+## Set colors for graphs below
+
+```{r}
+P4 <- createPalette(4, c("#99004C",  "#0000CC", "#00CCCC"), range = c(30, 80))
+swatch(P4)
+P4 <- sortByHue(P4)
+P4 <- as.vector(t(matrix(P4, ncol=4)))
+swatch(P4)
+names(P4) <- NULL
+```
+
+
+## Modern Domestication Group
+
+```{r}
+ord <- capscale(dist.modern ~ Fertilization *Variety,data=d.modern)
+sppscores(ord) <- data.modern
+
+adonis2(dist.modern~  Variety*Fertilization, 
+        data=d.modern, perm=999, by="terms") 
+pairwise.adonis(dist.modern,factors=d.modern$Fertilization)
+
+
+ev <- eigenvals(ord)
+Axis1_exp = round(ev[1] / sum(ev) * 100, 1)
+Axis2_exp = round(ev[2] / sum(ev) * 100, 1)
+axes.modern <- as.data.frame(vegan::scores(ord, display="sites", choices=c(1:2)))
+names(axes.modern) <- c("Axis1", "Axis2")
+axes.modern <- cbind(d.modern,axes.modern) 
+
+axes.modern$Variety <- factor(axes.modern$Variety,
+                              level = c('Bobcat', 'Quali T','Line 1','Line 2'))
+
+pm<-ggplot(data=axes.modern, aes(x=Axis1, y=Axis2, fill=Variety, shape=Fertilization)) +
+  geom_point(size=6) +
+  stat_ellipse(aes(group=Variety,color= Variety))+
+  scale_color_manual(values = P4)+
+  scale_fill_manual(values = P4)+
+  scale_shape_manual(values=c(21,22,23,24)) +
+  guides(fill = guide_legend(
+    override.aes=list(shape = rep(21,2)))) +
+  labs(x=paste0('CAP1 (', Axis1_exp, '%)'), 
+       y=paste0('CAP2 (', Axis2_exp, '%)')) +
+    theme(axis.text=element_text(size=10, colour = "black"), 
+        axis.title=element_text(size=20,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        legend.key = element_blank(),
+        legend.text = element_text(size = 20),
+        legend.background = element_blank(),
+        legend.title = element_blank());pm
+```
+
+
+### Traditional Group
+
+```{r}
+ord <- capscale(dist.trad ~ Variety*Fertilization,data=d.trad)
+sppscores(ord) <- data.trad
+adonis2(dist.trad ~ Variety*Fertilization,  data=d.trad, perm=999, by="terms") 
+pairwise.adonis(dist.trad,factors=d.trad$Fertilization)
+
+ev <- eigenvals(ord)
+Axis1_exp = round(ev[1] / sum(ev) * 100, 1)
+Axis2_exp = round(ev[2] / sum(ev) * 100, 1)
+axes.trad <- as.data.frame(vegan::scores(ord, display="sites", choices=c(1:2)))
+names(axes.trad) <- c("Axis1", "Axis2")
+axes.trad <- cbind(d.trad,axes.trad) 
+axes.trad$Variety <- factor(axes.trad$Variety,
+                              level = c('B Pink', 'Marglobe', 
+                                        'Matchless', 'Rutgers'))
+
+
+pt<-ggplot(data=axes.trad, aes(x=Axis1, y=Axis2, fill=Variety, shape=Fertilization)) +
+  geom_point(size=6) +
+  stat_ellipse(aes(group=Variety,color= Variety))+
+  scale_color_manual(values = P4)+
+  scale_fill_manual(values = P4)+
+  scale_shape_manual(values=c(21,22,23,24)) +
+  guides(fill = guide_legend(
+    override.aes=list(shape = rep(21,2)))) +
+  labs(x=paste0('CAP1 (', Axis1_exp, '%)'), 
+       y=paste0('CAP2 (', Axis2_exp, '%)')) +
+    theme(axis.text=element_text(size=10, colour = "black"), 
+        axis.title=element_text(size=20,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        legend.key = element_blank(),
+        legend.text = element_text(size = 20),
+        legend.background = element_blank(),
+        legend.title = element_blank());pt
+```
+
+### Wild Group
+
+```{r}
+ord <- capscale(dist.wild ~ Variety*Fertilization, data=d.wild)
+sppscores(ord) <- data.wild
+
+adonis2(dist.wild ~ Variety*Fertilization, data=d.wild, perm=999, by="terms") 
+pairwise.adonis(dist.wild,factors=d.wild$Variety, p.adjust.m = "fdr")
+pairwise.adonis(dist.wild,factors=d.wild$Fertilization, p.adjust.m = "fdr")
+
+ev <- eigenvals(ord)
+Axis1_exp = round(ev[1] / sum(ev) * 100, 1)
+Axis2_exp = round(ev[2] / sum(ev) * 100, 1)
+axes.wild <- as.data.frame(vegan::scores(ord, display="sites", choices=c(1:2)))
+names(axes.wild) <- c("Axis1", "Axis2")
+axes.wild <- cbind(d.wild,axes.wild) 
+axes.wild$Variety <- factor(axes.wild$Variety,
+                              level = c('LA0716','LA1519','LA1580','LA1698'))
+
+
+pw<-ggplot(data=axes.wild, aes(x=Axis1, y=Axis2, fill=Variety, shape=Fertilization)) +
+  geom_point(size=6) +
+  stat_ellipse(aes(group=Variety,color= Variety))+
+  scale_color_manual(values = P4)+
+  scale_fill_manual(values = P4)+
+  scale_shape_manual(values=c(21,22,23,24)) +
+  guides(fill = guide_legend(
+    override.aes=list(shape = rep(21,2)))) +
+  labs(x=paste0('CAP1 (', Axis1_exp, '%)'), 
+       y=paste0('CAP2 (', Axis2_exp, '%)')) +
+    theme(axis.text=element_text(size=10, colour = "black"), 
+        axis.title=element_text(size=20,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank(),
+        legend.key = element_blank(),
+        legend.text = element_text(size = 20),
+        legend.background = element_blank(),
+        legend.title = element_blank());pw
+```
+
+```{r}
+p <- pw/pt/pm;p
+ggsave(plot=p, filename = 'Data/Outputs/Figures/Figure4.pdf', width = 10, height = 18)
+
+```
+
+

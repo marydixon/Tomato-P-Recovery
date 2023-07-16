@@ -1,0 +1,239 @@
+Well,Variety,Fertilization,Rep,Domestication,Olsen_P
+B1,Bobcat,Fertilized,1,Modern,2.530949106
+C1,Bobcat,Unfertilized,3,Modern,0.880330124
+D1,Quali T,Fertilized,5,Modern,3.631361761
+E1,Quali T,Unfertilized,7,Modern,2.255845942
+F1,Line 1,Fertilized,9,Modern,4.181568088
+G1,Line 2,Fertilized,1,Modern,3.356258597
+B2,Bobcat,Fertilized,2,Modern,3.631361761
+C2,Bobcat,Unfertilized,4,Modern,1.980742779
+D2,Quali T,Fertilized,6,Modern,1.705639615
+E2,Quali T,Unfertilized,8,Modern,2.255845942
+F2,Line 1,Fertilized,10,Modern,4.731774415
+G2,Line 2,Fertilized,2,Modern,2.80605227
+B3,Bobcat,Fertilized,3,Modern,2.255845942
+C3,Bobcat,Unfertilized,5,Modern,1.980742779
+D3,Quali T,Fertilized,7,Modern,2.80605227
+E3,Quali T,Unfertilized,9,Modern,1.705639615
+F3,Line 1,Unfertilized,1,Modern,2.530949106
+G3,Line 2,Fertilized,3,Modern,3.631361761
+B4,Bobcat,Fertilized,4,Modern,2.255845942
+C4,Bobcat,Unfertilized,6,Modern,0.880330124
+D4,Quali T,Fertilized,8,Modern,2.530949106
+E4,Quali T,Unfertilized,10,Modern,1.430536451
+F4,Line 1,Unfertilized,2,Modern,1.705639615
+G4,Line 2,Fertilized,4,Modern,2.530949106
+B5,Bobcat,Fertilized,5,Modern,3.356258597
+C5,Bobcat,Unfertilized,7,Modern,1.980742779
+D5,Quali T,Fertilized,9,Modern,3.356258597
+E5,Line 1,Fertilized,1,Modern,1.705639615
+F5,Line 1,Unfertilized,3,Modern,1.430536451
+G5,Line 2,Fertilized,5,Modern,5.557083906
+B6,Bobcat,Fertilized,6,Modern,2.530949106
+C6,Bobcat,Unfertilized,8,Modern,1.430536451
+D6,Quali T,Fertilized,10,Modern,3.081155433
+E6,Line 1,Fertilized,2,Modern,3.356258597
+F6,Line 1,Unfertilized,4,Modern,1.155433287
+G6,Line 2,Fertilized,6,Modern,3.356258597
+B7,Bobcat,Fertilized,7,Modern,3.081155433
+C7,Bobcat,Unfertilized,9,Modern,3.906464924
+D7,Quali T,Unfertilized,1,Modern,1.980742779
+E7,Line 1,Fertilized,3,Modern,2.255845942
+F7,Line 1,Unfertilized,5,Modern,0.880330124
+G7,Line 2,Fertilized,7,Modern,1.980742779
+B8,Bobcat,Fertilized,8,Modern,2.530949106
+C8,Bobcat,Unfertilized,10,Modern,1.430536451
+D8,Quali T,Unfertilized,2,Modern,0.880330124
+E8,Line 1,Fertilized,4,Modern,3.081155433
+F8,Line 1,Unfertilized,6,Modern,0.60522696
+G8,Line 2,Fertilized,8,Modern,2.530949106
+B9,Bobcat,Fertilized,9,Modern,3.631361761
+C9,Quali T,Fertilized,1,Modern,2.530949106
+D9,Quali T,Unfertilized,3,Modern,2.530949106
+E9,Line 1,Fertilized,5,Modern,3.081155433
+F9,Line 1,Unfertilized,7,Modern,1.430536451
+G9,Line 2,Fertilized,9,Modern,2.80605227
+B10,Bobcat,Fertilized,10,Modern,1.430536451
+C10,Quali T,Fertilized,2,Modern,3.906464924
+D10,Quali T,Unfertilized,4,Modern,3.631361761
+E10,Line 1,Fertilized,6,Modern,2.530949106
+F10,Line 1,Unfertilized,8,Modern,1.430536451
+G10,Line 2,Fertilized,10,Modern,3.081155433
+B11,Bobcat,Unfertilized,1,Modern,0.880330124
+C11,Quali T,Fertilized,3,Modern,1.705639615
+D11,Quali T,Unfertilized,5,Modern,5.281980743
+E11,Line 1,Fertilized,7,Modern,2.530949106
+F11,Line 1,Unfertilized,9,Modern,1.705639615
+G11,Line 2,Unfertilized,1,Modern,0.60522696
+B12,Bobcat,Unfertilized,2,Modern,0.330123796
+C12,Quali T,Fertilized,4,Modern,3.631361761
+D12,Quali T,Unfertilized,6,Modern,2.255845942
+E12,Line 1,Fertilized,8,Modern,1.980742779
+F12,Line 1,Unfertilized,10,Modern,1.705639615
+G12,Line 2,Unfertilized,2,Modern,
+H1,Line 2,Unfertilized,3,Modern,1.705639615
+H2,Line 2,Unfertilized,4,Modern,0.330123796
+H3,Line 2,Unfertilized,5,Modern,1.430536451
+H4,Line 2,Unfertilized,6,Modern,1.705639615
+H5,Line 2,Unfertilized,7,Modern,1.705639615
+H6,Line 2,Unfertilized,8,Modern,0.055020633
+H7,Line 2,Unfertilized,9,Modern,0.60522696
+H8,Line 2,Unfertilized,10,Modern,0.880330124
+B1,Rutgers,Unfertilized,1,Traditional,1.656976744
+C1,Rutgers,Fertilized,3,Traditional,0.784883721
+D1,Matchless,Unfertilized,5,Traditional,1.656976744
+E1,Matchless,Fertilized,7,Traditional,3.110465116
+F1,Marglobe,Unfertilized,9,Traditional,1.656976744
+G1,B Pink,Unfertilized,1,Traditional,1.947674419
+B2,Rutgers,Unfertilized,2,Traditional,1.656976744
+C2,Rutgers,Fertilized,4,Traditional,1.36627907
+D2,Matchless,Unfertilized,6,Traditional,5.726744186
+E2,Matchless,Fertilized,8,Traditional,0.494186047
+F2,Marglobe,Unfertilized,10,Traditional,2.529069767
+G2,B Pink,Unfertilized,2,Traditional,2.529069767
+B3,Rutgers,Unfertilized,3,Traditional,10.66860465
+C3,Rutgers,Fertilized,5,Traditional,1.947674419
+D3,Matchless,Unfertilized,7,Traditional,3.110465116
+E3,Matchless,Fertilized,9,Traditional,3.691860465
+F3,Marglobe,Fertilized,1,Traditional,3.691860465
+G3,B Pink,Unfertilized,3,Traditional,2.819767442
+B4,Rutgers,Unfertilized,4,Traditional,3.401162791
+C4,Rutgers,Fertilized,6,Traditional,2.819767442
+D4,Matchless,Unfertilized,8,Traditional,1.36627907
+E4,Matchless,Fertilized,10,Traditional,1.656976744
+F4,Marglobe,Fertilized,2,Traditional,2.238372093
+G4,B Pink,Unfertilized,4,Traditional,2.238372093
+B5,Rutgers,Unfertilized,5,Traditional,1.36627907
+C5,Rutgers,Fertilized,7,Traditional,1.36627907
+D5,Matchless,Unfertilized,9,Traditional,1.36627907
+E5,Marglobe,Unfertilized,1,Traditional,1.075581395
+F5,Marglobe,Fertilized,3,Traditional,0.494186047
+G5,B Pink,Unfertilized,5,Traditional,1.656976744
+B6,Rutgers,Unfertilized,6,Traditional,1.947674419
+C6,Rutgers,Fertilized,8,Traditional,2.238372093
+D6,Matchless,Unfertilized,10,Traditional,3.401162791
+E6,Marglobe,Unfertilized,2,Traditional,2.819767442
+F6,Marglobe,Fertilized,4,Traditional,2.819767442
+G6,B Pink,Unfertilized,6,Traditional,2.529069767
+B7,Rutgers,Unfertilized,7,Traditional,2.819767442
+C7,Rutgers,Fertilized,9,Traditional,2.529069767
+D7,Matchless,Fertilized,1,Traditional,2.238372093
+E7,Marglobe,Unfertilized,3,Traditional,2.238372093
+F7,Marglobe,Fertilized,5,Traditional,1.36627907
+G7,B Pink,Unfertilized,7,Traditional,1.656976744
+B8,Rutgers,Unfertilized,8,Traditional,2.529069767
+C8,Rutgers,Fertilized,10,Traditional,1.36627907
+D8,Matchless,Fertilized,2,Traditional,1.656976744
+E8,Marglobe,Unfertilized,4,Traditional,1.075581395
+F8,Marglobe,Fertilized,6,Traditional,1.656976744
+G8,B Pink,Unfertilized,8,Traditional,1.656976744
+B9,Rutgers,Unfertilized,9,Traditional,3.691860465
+C9,Matchless,Unfertilized,1,Traditional,2.529069767
+D9,Matchless,Fertilized,3,Traditional,2.238372093
+E9,Marglobe,Unfertilized,5,Traditional,2.238372093
+F9,Marglobe,Fertilized,7,Traditional,3.401162791
+G9,B Pink,Unfertilized,9,Traditional,2.529069767
+B10,Rutgers,Unfertilized,10,Traditional,3.110465116
+C10,Matchless,Unfertilized,2,Traditional,3.110465116
+D10,Matchless,Fertilized,4,Traditional,3.401162791
+E10,Marglobe,Unfertilized,6,Traditional,2.819767442
+F10,Marglobe,Fertilized,8,Traditional,2.529069767
+G10,B Pink,Unfertilized,10,Traditional,3.691860465
+B11,Rutgers,Fertilized,1,Traditional,1.36627907
+C11,Matchless,Unfertilized,3,Traditional,2.529069767
+D11,Matchless,Fertilized,5,Traditional,1.947674419
+E11,Marglobe,Unfertilized,7,Traditional,1.36627907
+F11,Marglobe,Fertilized,9,Traditional,2.529069767
+G11,B Pink,Fertilized,1,Traditional,2.238372093
+B12,Rutgers,Fertilized,2,Traditional,2.529069767
+C12,Matchless,Unfertilized,4,Traditional,2.238372093
+D12,Matchless,Fertilized,6,Traditional,2.529069767
+E12,Marglobe,Unfertilized,8,Traditional,1.075581395
+F12,Marglobe,Fertilized,10,Traditional,2.238372093
+G12,B Pink,Fertilized,2,Traditional,7.761627907
+H1,B Pink,Fertilized,3,Traditional,4.273255814
+H2,B Pink,Fertilized,4,Traditional,3.110465116
+H3,B Pink,Fertilized,5,Traditional,6.308139535
+H4,B Pink,Fertilized,6,Traditional,4.563953488
+H5,B Pink,Fertilized,7,Traditional,3.110465116
+H6,B Pink,Fertilized,8,Traditional,2.819767442
+H7,B Pink,Fertilized,9,Traditional,3.401162791
+H8,B Pink,Fertilized,10,Traditional,2.529069767
+B1,LA1698,Unfertilized,1,Wild,0.776397516
+C1,LA1698,Fertilized,3,Wild,1.397515528
+D1,LA1580,Unfertilized,5,Wild,0.776397516
+E1,LA1580,Fertilized,7,Wild,0.776397516
+F1,LA1519,Unfertilized,9,Wild,0.155279503
+G1,LA0716,Unfertilized,1,Wild,0.155279503
+B2,LA1698,Unfertilized,2,Wild,1.397515528
+C2,LA1698,Fertilized,4,Wild,0.465838509
+D2,LA1580,Unfertilized,6,Wild,0.776397516
+E2,LA1580,Fertilized,8,Wild,0.776397516
+F2,LA1519,Unfertilized,10,Wild,1.086956522
+G2,LA0716,Unfertilized,2,Wild,1.708074534
+B3,LA1698,Unfertilized,3,Wild,3.571428571
+C3,LA1698,Fertilized,5,Wild,2.01863354
+D3,LA1580,Unfertilized,7,Wild,3.260869565
+E3,LA1580,Fertilized,9,Wild,1.708074534
+F3,LA1519,Fertilized,1,Wild,2.950310559
+G3,LA0716,Unfertilized,3,Wild,3.571428571
+B4,LA1698,Unfertilized,4,Wild,3.571428571
+C4,LA1698,Fertilized,6,Wild,2.639751553
+D4,LA1580,Unfertilized,8,Wild,2.950310559
+E4,LA1580,Fertilized,10,Wild,1.086956522
+F4,LA1519,Fertilized,2,Wild,1.086956522
+G4,LA0716,Unfertilized,4,Wild,1.086956522
+B5,LA1698,Unfertilized,5,Wild,1.086956522
+C5,LA1698,Fertilized,7,Wild,1.086956522
+D5,LA1580,Unfertilized,9,Wild,0.465838509
+E5,LA1519,Unfertilized,1,Wild,0.155279503
+F5,LA1519,Fertilized,3,Wild,1.086956522
+G5,LA0716,Unfertilized,5,Wild,1.708074534
+B6,LA1698,Unfertilized,6,Wild,2.639751553
+C6,LA1698,Fertilized,8,Wild,2.01863354
+D6,LA1580,Unfertilized,10,Wild,2.950310559
+E6,LA1519,Unfertilized,2,Wild,3.260869565
+F6,LA1519,Fertilized,4,Wild,2.01863354
+G6,LA0716,Unfertilized,6,Wild,4.50310559
+B7,LA1698,Unfertilized,7,Wild,3.571428571
+C7,LA1698,Fertilized,9,Wild,3.881987578
+D7,LA1580,Fertilized,1,Wild,1.708074534
+E7,LA1519,Unfertilized,3,Wild,2.329192547
+F7,LA1519,Fertilized,5,Wild,0.776397516
+G7,LA0716,Unfertilized,7,Wild,0.465838509
+B8,LA1698,Unfertilized,8,Wild,1.397515528
+C8,LA1698,Fertilized,10,Wild,0.155279503
+D8,LA1580,Fertilized,2,Wild,0.776397516
+E8,LA1519,Unfertilized,4,Wild,0.776397516
+F8,LA1519,Fertilized,6,Wild,1.708074534
+G8,LA0716,Unfertilized,8,Wild,0.155279503
+B9,LA1698,Unfertilized,9,Wild,2.01863354
+C9,LA1580,Unfertilized,1,Wild,1.397515528
+D9,LA1580,Fertilized,3,Wild,2.639751553
+E9,LA1519,Unfertilized,5,Wild,2.639751553
+F9,LA1519,Fertilized,7,Wild,2.329192547
+G9,LA0716,Unfertilized,9,Wild,2.01863354
+B10,LA1698,Unfertilized,10,Wild,2.639751553
+C10,LA1580,Unfertilized,2,Wild,2.950310559
+D10,LA1580,Fertilized,4,Wild,3.260869565
+E10,LA1519,Unfertilized,6,Wild,2.639751553
+F10,LA1519,Fertilized,8,Wild,2.950310559
+G10,LA0716,Unfertilized,10,Wild,1.086956522
+B11,LA1698,Fertilized,1,Wild,3.881987578
+C11,LA1580,Unfertilized,3,Wild,3.260869565
+D11,LA1580,Fertilized,5,Wild,3.571428571
+E11,LA1519,Unfertilized,7,Wild,4.192546584
+F11,LA1519,Fertilized,9,Wild,1.086956522
+G11,LA0716,Fertilized,1,Wild,5.124223602
+B12,LA1698,Fertilized,2,Wild,2.639751553
+C12,LA1580,Unfertilized,4,Wild,3.571428571
+D12,LA1580,Fertilized,6,Wild,2.950310559
+E12,LA1519,Unfertilized,8,Wild,2.950310559
+F12,LA1519,Fertilized,10,Wild,3.881987578
+G12,LA0716,Fertilized,2,Wild,2.01863354
+H1,LA0716,Fertilized,3,Wild,7.608695652
+H2,LA0716,Fertilized,5,Wild,6.98757764
+H3,LA0716,Fertilized,7,Wild,5.434782609
+H4,LA0716,Fertilized,8,Wild,75.62111801
+H5,LA0716,Fertilized,9,Wild,4.50310559
+H6,LA0716,Fertilized,10,Wild,9.161490683

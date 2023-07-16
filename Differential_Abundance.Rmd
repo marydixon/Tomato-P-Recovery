@@ -1,0 +1,171 @@
+---
+title: "Differential Abundance"
+author: "MD"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: 
+ html_document:
+    toc: true
+    toc_float: true
+editor_options: 
+  chunk_output_type: console
+---
+
+
+
+```{r}
+library(patchwork)
+```
+
+# Read in Data 
+
+```{r}
+P.count <- readRDS('Data/Outputs/Intermediate_Data/Phyloseq.Count.Data.RDS')
+
+P.sub <- subset_samples(P.count, final >= 10000)
+
+colnames(tax_table(P.sub)) <- c('Kingdom', 'Phylum', 'Class', 'Order', 'Family', 'Genus', 'Species')
+```
+
+
+
+
+# Differential Abundance 
+
+
+# Wild v Traditional 
+
+```{r}
+out.glom <- microbiomeMarker::run_deseq2(
+  P.sub,
+  group =  "Domestication",
+  taxa_rank = "Species",
+  norm="RLE",
+  transform="identity",
+  p_adjust='fdr',
+  pvalue_cutoff=0.05,
+  contrast = c("Wild","Traditional")
+)
+
+diff.abund1 <- data.frame(microbiomeMarker::marker_table(out.glom))
+
+x = tapply(diff.abund1$ef_logFC, diff.abund1$feature, function(x) max(x))
+x = sort(-x, TRUE)
+diff.abund1$feature = factor(as.character(diff.abund1$feature), levels=names(x))
+
+p1<-ggplot(diff.abund1, aes(x=feature, y=abs(ef_logFC), color=enrich_group, shape = enrich_group)) + 
+  geom_point(size=6) + 
+  scale_color_manual(values = c('#00CCCC'))+
+  labs(y='Log Fold Change')+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+        axis.text=element_text(size=14, colour = "black"), 
+        axis.title=element_text(size=15,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        legend.key = element_blank(),
+        legend.text = element_text(size = 14),
+        legend.title = element_blank(),
+        axis.title.x = element_blank());p1
+```
+
+# Wild v Modern
+
+```{r}
+out.glom <- microbiomeMarker::run_deseq2(
+  P.sub,
+  group =  "Domestication",
+  taxa_rank = "Species",
+  norm="RLE",
+  transform="identity",
+  p_adjust='fdr',
+  pvalue_cutoff=0.05,
+  contrast = c("Modern","Wild")
+)
+diff.abund2 <- data.frame(microbiomeMarker::marker_table(out.glom))
+
+x = tapply(diff.abund2$ef_logFC, diff.abund2$feature, function(x) max(x))
+x = sort(x, TRUE)
+diff.abund2$feature = factor(as.character(diff.abund2$feature), levels=names(x))
+
+p2<-ggplot(diff.abund2, aes(x=feature, y=ef_logFC, color=enrich_group, shape = enrich_group)) + 
+  geom_point(size=6, shape=c(16,15,15,15,15,15,16,16,16,15)) + 
+  scale_color_manual(values = c('#99004C', '#00CCCC'))+
+  labs(y='Log Fold Change')+
+  theme(axis.text.x = element_text(angle = 90,vjust = 0.5, hjust=1),
+        axis.text=element_text(size=14, colour = "black"), 
+        axis.title=element_text(size=15,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        legend.key = element_blank(),
+        legend.text = element_text(size = 14),
+        legend.title = element_blank(),
+        axis.title.x = element_blank());p2
+```
+
+# Traditional v Modern
+
+```{r}
+out.glom <- microbiomeMarker::run_deseq2(
+  P.sub,
+  group =  "Domestication",
+  taxa_rank = "Species",
+  norm="RLE",
+  transform="identity",
+  p_adjust='fdr',
+  pvalue_cutoff=0.05,
+  contrast = c("Modern","Traditional")
+)
+diff.abund3 <- data.frame(microbiomeMarker::marker_table(out.glom))
+
+```
+
+# Variety
+
+```{r}
+out.glom <- microbiomeMarker::run_deseq2(
+  P.sub,
+  group =  "Variety",
+  taxa_rank = "Species",
+  norm="RLE",
+  transform="identity",
+  p_adjust='fdr',
+  pvalue_cutoff=0.05)
+
+diff.abund4 <- data.frame(microbiomeMarker::marker_table(out.glom))
+
+x = tapply(diff.abund4$ef_F, diff.abund4$feature, function(x) max(x))
+x = sort(x, TRUE)
+diff.abund4$feature = factor(as.character(diff.abund4$feature), levels=names(x))
+
+level_order <- factor(diff.abund4$feature,level = c('Rhizobacter gummiphilus', 'Leptolyngbya sp. O-77', 'Oscillatoria nigro-viridis', 'Microcoleus sp. PCC 7113', 'Sandaracinus amylolyticus', 'Brevitalea aridisoli', 'Brevitalea deliciosa'))
+
+p3 <- ggplot(diff.abund4, aes(x=feature, y=ef_F, color=enrich_group)) + 
+  geom_point(size=6, shape=c(17,18,17,17)) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 0, vjust=0.5)) +
+  scale_color_manual(values = c('#0000CC','#FF8000')) +
+  labs(y="Log Fold Change")+
+  theme(axis.text.x = element_text(angle = 90,vjust = 0.5, hjust=1),
+        axis.text=element_text(size=14, colour = "black"), 
+        axis.title=element_text(size=15,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        legend.key = element_blank(),
+        legend.text = element_text(size = 14),
+        legend.title = element_blank(),
+        axis.title.x = element_blank());p3
+  
+```
+
+```{r}
+p <- (p1 | p2 )/p3; p
+ggsave(plot=p, filename = 'Data/Outputs/Figures/Figure5.pdf', width = 14, height = 10)
+
+```

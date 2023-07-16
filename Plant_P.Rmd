@@ -1,0 +1,157 @@
+---
+title: "Plant Phosphorus Uptake"
+author: "MD"
+date: "'r format(Sys.time(), '%b %d, %Y')'"
+output: 
+ html_document:
+   toc: true
+   toc_float: true
+   editor_options:
+   chunck_output_type: console
+   chunk_output_type: console
+---
+
+
+
+```{r}
+library(patchwork)
+library(tidyverse)
+library(emmeans)
+library(car)
+```
+
+# Read in data
+
+```{r}
+plantp <- read.csv('Data/Inputs/Plant_P.csv') %>% 
+  filter(!is.na(P_Content_mg.shoot))
+```
+
+```{r}
+d.wide <- plantp %>% 
+  dplyr::select(.,Variety,Domestication,Fertilization,Rep,
+                P_Content_mg.shoot)  %>% 
+  pivot_wider(.,names_from = Fertilization, 
+              values_from = c(P_Content_mg.shoot)) %>% 
+  filter(!is.na(Unfertilized)) %>% 
+  filter(!is.na(Fertilized))
+  
+df <- d.wide %>% 
+  mutate('abs.p' = (Fertilized-Unfertilized))
+```
+
+
+
+# Model Fitting
+
+```{r}
+# p uptake
+par(mfrow = c(2,2))
+
+mod <- plantp %>% 
+  lm((P_Content_mg.shoot)~Fertilization*Domestication/Variety ,data=.)
+plot(mod)
+aov.mod<- aov(mod)
+summary(aov.mod)
+e <- emmeans(mod, pairwise ~ Fertilization*Domestication)
+e.df <- as.data.frame(e$contrasts) %>% 
+  filter(., p.value < 0.05) 
+e.df
+e <- emmeans(mod, pairwise ~ Domestication*Variety)
+e.df <- as.data.frame(e$contrasts) %>% 
+  filter(., p.value < 0.05) 
+e.df
+```
+
+```{r}
+# p difference
+mod <- df %>% 
+  lm((abs.p)~Domestication/Variety ,data=.)
+plot(mod)
+aov.mod<- aov(mod)
+summary(aov.mod)
+emmeans(mod, pairwise ~ Domestication)
+e <- emmeans(mod, pairwise ~ Domestication*Variety)
+e.df <- as.data.frame(e$contrasts) %>% 
+  filter(., p.value < 0.05) 
+e.df
+```
+
+
+# Graphs
+
+
+
+
+
+```{r}
+sum_d <-summarise(group_by(plantp,Variety,Domestication,Fertilization),
+  n = n(),
+  mean = mean(P_Content_mg.shoot),
+  sd = sd(P_Content_mg.shoot),
+  se = sd/sqrt(n)) 
+
+sum_d$letters <- c('abcd','ab','cdef','ab','f','b','cdef','ab','def','ab','ef','ab','ab','ab','abcd','ab','abcde','ab','ab','ab','bc','ab','cdef','a') #from emmeans contrasts above for Fertilization*Domestication*Variety
+level_order <- factor(sum_d$Variety,level = c('LA0716',  'LA1580', 'LA1698', 'LA1519', 'Matchless', 'B Pink', 'Marglobe', 'Rutgers','Bobcat','Quali T','Line 1','Line 2'))
+p.content<-ggplot(sum_d, aes(level_order, mean, fill = Domestication)) + 
+  geom_col(position = 'dodge') +
+  geom_text(aes(label = letters), vjust = -0.45, hjust = -0.28, size = 6) +
+  facet_wrap(~Fertilization, scales = 'free')+
+  labs(y='Shoot P Uptake (mg P)')+
+  geom_errorbar(aes(ymin = mean-se, 
+                    ymax = mean+se),
+                position=position_dodge(0.9), width = .25)+
+  scale_fill_manual(values = c('#A6CEE3','#1F78B4','#B2DF8A' )) +
+  theme(axis.text.x=element_text(size=14, colour = "black", angle = 90), 
+        axis.text.y=element_text(size=14, colour = "black"),
+        axis.title=element_text(size=16,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        legend.position = 'none',
+        axis.title.x = element_blank());p.content
+
+```
+
+
+
+
+
+```{r fig3, fig.height = 8, fig.width = 13}
+sum_abs <-summarise(group_by(df,Variety,Domestication),
+  n = n(),
+  mean = mean(abs.p),
+  sd = sd(abs.p),
+  se = sd/sqrt(n)) 
+
+sum_abs$letters <- c('abc','bc','bc','abc','abc','c','ab','abc','abc','a','abc','c') #from emmeans contrasts above for Domestication*Variety
+level_order.df <- factor(sum_abs$Variety,level = c('LA0716',  'LA1580', 'LA1698', 'LA1519', 'Matchless', 'B Pink', 'Marglobe', 'Rutgers','Bobcat','Quali T','Line 1','Line 2'))
+p<-ggplot(sum_abs, aes(level_order.df, mean, fill = Domestication)) + 
+  geom_col(position = 'dodge') +
+  geom_text(aes(label = letters), vjust = -0.45, hjust = -0.28, size = 6) +
+  labs(y='Difference in Shoot P Uptake (mg P)')+
+  geom_errorbar(aes(ymin = mean-se, 
+                    ymax = mean+se),
+                position=position_dodge(0.9), width = .25)+
+  scale_fill_manual(values = c('#A6CEE3','#1F78B4','#B2DF8A' )) +
+  theme(axis.text.x=element_text(size=14, colour = "black", angle = 90), 
+        axis.text.y=element_text(size=14, colour = "black"),
+        axis.title=element_text(size=16,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        legend.position = 'none',
+        axis.title.x = element_blank());p
+
+```
+
+```{r}
+p<- p.content/p
+ggsave(plot=p, filename = 'Data/Outputs/Figures/Figure2.pdf', width = 14, height = 10)
+
+```
+

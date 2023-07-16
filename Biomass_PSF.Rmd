@@ -1,0 +1,208 @@
+---
+title: "Relative Biomass and Phosphorus Stress Factor"
+author: "MD"
+date: "'r format(Sys.time(), '%b %d, %Y')'"
+output: 
+ html_document:
+   toc: true
+   toc_float: true
+   editor_options:
+   chunck_output_type: console
+   chunk_output_type: console
+---
+
+
+```{r}
+library(patchwork)
+library(tidyverse)
+library(emmeans)
+library(RColorBrewer)
+library(car)
+```
+
+
+
+# Read in Data
+
+```{r}
+bio <- read.csv('Data/Inputs/Dry_Biomass.csv') 
+
+
+rel_shoot <- bio %>% 
+  dplyr::select(Variety,Domestication,Fertilization,Replication,Shoot_g) %>% 
+  group_by(Domestication) %>% 
+  pivot_wider(.,names_from = 'Fertilization', values_from = 'Shoot_g') %>% 
+  mutate(Rel.Shoot = (Unfertilized*100/Fertilized)) %>% 
+  mutate(PSF = (((Fertilized-Unfertilized)/Unfertilized))*100)%>% 
+ filter(!is.na(Rel.Shoot)) 
+
+rel_root <- bio %>% 
+  dplyr::select(Variety,Domestication,Fertilization,Replication,Root_g) %>% 
+  group_by(Domestication) %>% 
+  pivot_wider(.,names_from = 'Fertilization', values_from = 'Root_g') %>% 
+  mutate(Rel.Root = (Unfertilized*100/Fertilized)) %>% 
+ filter(!is.na(Rel.Root)) 
+
+rel_shoot$Variety <- as.factor(rel_shoot$Variety)
+rel_shoot$Domestication <- as.factor(rel_shoot$Domestication)
+rel_root$Variety <- as.factor(rel_root$Variety)
+rel_root$Domestication <- as.factor(rel_root$Domestication)
+```
+
+
+
+# Nested models
+
+## Relative biomass
+
+```{r}
+#Rel Shoot
+mod <- rel_shoot %>% 
+  lm(Rel.Shoot ~ Domestication / Variety, data = .)
+par(mfrow=c(2,2))
+plot(mod)
+outlierTest(mod)
+
+d.s <- rel_shoot[-c(18),]
+mod <- d.s %>% 
+  lm(Rel.Shoot ~ Domestication / Variety, data = .)
+plot(mod)
+aov_mod <- aov(mod)
+summary(aov_mod) 
+emmeans(mod, pairwise ~ Domestication) 
+e <- emmeans(mod, pairwise ~ Domestication*Variety)
+e.df <- as.data.frame(e$contrasts) %>% 
+  filter(., p.value < 0.05) 
+e.df
+```
+
+
+```{r}
+#Rel Root
+mod <- rel_root %>% 
+  lm(Rel.Root ~ Domestication / Variety, data = .)
+par(mfrow=c(2,2))
+plot(mod)
+outlierTest(mod)
+
+d.r <- rel_root[-c(18),]
+mod <- d.r %>% 
+  lm(Rel.Root ~ Domestication / Variety, data = .)
+plot(mod)
+aov_mod <- aov(mod)
+summary(aov_mod) 
+emmeans(mod, pairwise ~ Domestication) 
+```
+
+
+## PSF
+```{r}
+#PSF
+mod <- rel_shoot %>% 
+  lm(PSF ~ Domestication / Variety, data = .)
+par(mfrow=c(2,2))
+plot(mod)
+
+aov_mod <- aov(mod)
+summary(aov_mod) 
+emmeans(mod, pairwise ~ Domestication) 
+e <- emmeans(mod, pairwise ~ Domestication*Variety)
+e.df <- as.data.frame(e$contrasts) %>% 
+  filter(., p.value < 0.05) 
+e.df
+```
+
+# Graphs
+
+```{r}
+sum_shoot <-summarise(group_by(d.s,Variety,Domestication),
+  n = n(),
+  mean = mean(Rel.Shoot),
+  sd = sd(Rel.Shoot),
+  se = sd/sqrt(n))
+sum_shoot$letters <- c('abc', 'ab', 'c', 'ab', 'bc', 'abc', 'abc', 'abc', 'ab', 'a', 'abc','abc')#from emmeans contrasts above for Domestication*Variety
+
+level_order1 <- factor(sum_shoot$Variety,level = c('LA0716', 'LA1580','LA1698','LA1519', 'Matchless','B Pink','Marglobe','Rutgers','Bobcat','Quali T','Line 1','Line 2'))
+p1<-ggplot(sum_shoot, aes(level_order1, mean, fill = Domestication)) +
+  geom_col(position = 'dodge') +
+  geom_text(aes(label = letters), vjust = -0.45, hjust = -0.28, size = 6) +
+  scale_fill_brewer(palette = 'Paired') +  
+  labs(y='Relative Dry Biomass (%)')+
+  geom_errorbar(aes(ymin = mean-se, ymax = mean+se),position=position_dodge(0.9), width = .25)+
+ theme(axis.text=element_text(size=14, colour = "black", angle = 90), 
+        axis.title=element_text(size=12,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        legend.position = 'none',
+        axis.title.x = element_blank());p1
+
+```
+
+
+
+```{r}
+sum_root <-summarise(group_by(d.r,Variety,Domestication),
+  n = n(),
+  mean = mean(Rel.Root),
+  sd = sd(Rel.Root),
+  se = sd/sqrt(n))
+sum_root$letters <- c('a', 'a','a', 'a','a', 'a','a', 'a','a', 'a','a', 'a') #no differences
+
+
+level_order2 <- factor(sum_root$Variety,level = c('LA0716',  'LA1580','LA1698','LA1519','Matchless','B Pink','Marglobe','Rutgers','Bobcat','Quali T','Line 1','Line 2'))
+p2<-ggplot(sum_root, aes(level_order2, mean, fill = Domestication)) +
+  geom_col(position = 'dodge') +
+  geom_text(aes(label = letters), vjust = -0.45, hjust = -0.28, size = 6) +
+  scale_fill_brewer(palette = 'Paired') +  
+  labs(y='Relative Root Biomass (%)')+
+  geom_errorbar(aes(ymin = mean-se, ymax = mean+se),position=position_dodge(0.9), width = .25)+
+ theme(axis.text=element_text(size=14, colour = "black", angle = 90), 
+        axis.title.y=element_blank(),
+        axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        legend.title = element_blank(),
+        legend.position = 'none',
+        axis.title.x = element_blank());p2
+
+```
+
+
+```{r}
+sum_psf <-summarise(group_by(rel_shoot,Variety,Domestication),
+  n = n(),
+  mean = mean(PSF),
+  sd = sd(PSF),
+  se = sd/sqrt(n)) 
+sum_psf$letters <- c('b','b','ab','b','a','b','b','b','b','b','b','b') #from emmeans contrasts above for Domestication*Variety
+
+
+level_order <- factor(sum_psf$Variety,level = c('LA0716',  'LA1580','LA1698','LA1519','Matchless','B Pink', 'Marglobe', 'Rutgers', 'Bobcat','Quali T','Line 1','Line 2'))
+p3<-ggplot(sum_psf, aes(level_order, mean, fill = Domestication)) +
+  geom_col(position = 'dodge') +
+  geom_text(aes(label = letters), vjust = -0.45, hjust = -0.28, size = 6) +
+  scale_fill_brewer(palette = 'Paired')+  
+  labs(y='Phosphorus Stress Factor (%)')+
+  geom_errorbar(aes(ymin = mean-se, ymax = mean+se),position=position_dodge(0.9), width = .25)+
+ theme(axis.text=element_text(size=14, colour = "black", angle = 90), 
+        axis.title=element_text(size=12,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        legend.position = 'none',
+        axis.title.x = element_blank());p3
+
+```
+
+```{r}
+p<- (p1|p2)/p3; p
+ggsave(plot=p, filename = 'Data/Outputs/Figures/Figure1.pdf', width = 14, height = 10)
+```
+

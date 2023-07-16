@@ -1,0 +1,253 @@
+---
+title: "06.19.23.nested.kegg"
+author: "MD"
+date: "'r format(Sys.time(), '%b %d, %Y')'"
+output: 
+ html_document:
+   toc: true
+   toc_float: true
+ editor_options:
+   chunck_output_type: console
+   chunk_output_type: console
+---
+
+
+```{r}
+library(RColorBrewer)
+library(patchwork)
+```
+
+
+```{r}
+P.rel <- readRDS('Data/Outputs/Intermediate_Data/Phyloseq.RelativeAbundance.RDS')
+kegg <- read_excel('Data/Inputs//EMU_database.GIBBs.KO.PICRUST2.xlsx', sheet='EMU_database.GIBBs.PICRUSt2', range='B9:BE17565')
+kegg <- kegg %>%
+  mutate_if(is.numeric, replace_na, replace=0)
+```
+
+
+# Model Fitting
+
+
+```{r}
+# P decomposer
+wanted <- kegg[kegg$phoA > 0 | kegg$phoD > 0 | kegg$PHO > 0 | kegg$appA > 0 | kegg$phoN > 0 ,  ]$Species
+P.sub <- subset_taxa(P.rel, species %in% wanted)
+
+P.glom <- tax_glom(P.sub, taxrank="superkingdom")
+P.glom <- prune_taxa(taxa_sums(P.glom) > 0, P.glom)
+
+pdecomp.all <- psmelt(P.glom) 
+pdecomp.all$Fertilization <- factor(pdecomp.all$Fertilization)
+pdecomp.all$Variety <- factor(pdecomp.all$Variety)
+pdecomp.all$Domestication  <- factor(pdecomp.all$Domestication)
+
+par(mfrow=c(2,2))
+mod <- pdecomp.all %>% 
+  lm(Abundance ~ Fertilization*Domestication/Variety, data = .)
+plot(mod)
+aov.mod <- aov(mod)
+summary(aov.mod)
+
+e <- emmeans(mod, pairwise ~ Fertilization*Domestication*Variety) 
+e.df <- as.data.frame(e$contrasts) %>% 
+  filter(., p.value < 0.05)
+e.df
+```
+
+
+```{r}
+# P solubilizer
+wanted <- kegg[kegg$pqqC> 0 ,  ]$Species
+P.sub <- subset_taxa(P.rel, species %in% wanted)
+
+P.glom <- tax_glom(P.sub, taxrank="superkingdom")
+P.glom <- prune_taxa(taxa_sums(P.glom) > 0, P.glom)
+
+psol.all <- psmelt(P.glom)
+psol.all$Fertilization <- factor(psol.all$Fertilization)
+psol.all$Variety <- factor(psol.all$Variety)
+psol.all$Domestication  <- factor(psol.all$Domestication)
+
+mod <- psol.all %>%
+  lm(Abundance ~ Fertilization*Domestication/Variety, data = .)
+plot(mod)
+aov.mod <- aov(mod)
+summary(aov.mod) 
+
+
+emmeans(mod, pairwise ~ Domestication) 
+e <- emmeans(mod, pairwise ~ Fertilization*Domestication*Variety) 
+e.df <- as.data.frame(e$contrasts) %>%
+  filter(., p.value < 0.05)
+e.df
+```
+
+# Graphs
+
+```{r}
+# P decomposer
+
+decomp.f <- pdecomp.all %>% 
+  filter(.,Fertilization=='Fertilized')
+decomp.u <- pdecomp.all %>% 
+  filter(.,Fertilization=='Unfertilized')
+
+level_order1 <- factor(decomp.f$Variety,level = c('LA0716', 'LA1580','LA1519', 'LA1698','Matchless','B Pink','Marglobe','Rutgers','Bobcat','Quali T','Line 1','Line 2'))
+p.decompf <- ggplot(decomp.f, aes(x=level_order1, y=Abundance)) +
+  geom_boxplot(aes(fill=Domestication)) +
+  geom_text(label='a', x=1,y=0.66, size = 5) +
+  geom_text(label='a', x=2,y=0.65, size = 5) +
+  geom_text(label='a', x=3,y=0.62, size = 5) +
+  geom_text(label='a', x=4,y=0.68, size = 5) +
+  geom_text(label='a', x=5,y=0.7, size = 5) +
+  geom_text(label='a', x=6,y=0.66, size = 5) +
+  geom_text(label='a', x=7,y=0.63, size = 5) +
+  geom_text(label='a', x=8,y=0.65, size = 5) +
+  geom_text(label='a', x=9,y=0.66, size = 5) +
+  geom_text(label='a', x=10,y=0.68, size = 5) +
+  geom_text(label='a', x=11,y=0.65, size = 5) +
+  geom_text(label='a', x=12,y=0.64, size = 5) +
+  scale_fill_brewer(palette = 'Paired') +  
+  labs(y="P Decomposer Relative Abundance")+
+  theme(axis.text.x=element_text(size=14, colour = "black", angle =90 ), 
+        axis.text.y=element_text(size=14, colour = "black"),
+        axis.title=element_text(size=14,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        legend.key = element_blank(),
+        legend.text = element_text(size = 24),
+        strip.text.y = element_text(size=8, face="bold"), 
+        legend.title = element_blank(),
+       legend.position = 'none',
+        strip.text = element_blank(),
+        strip.background = element_blank(),
+       axis.title.x = element_blank());p.decompf
+
+level_order2 <- factor(decomp.u$Variety,level = c('LA0716', 'LA1580','LA1519', 'LA1698','Matchless','B Pink','Marglobe','Rutgers','Bobcat','Quali T','Line 1','Line 2'))
+p.decompu <- ggplot(decomp.u, aes(x=level_order2, y=Abundance)) +
+  geom_boxplot(aes(fill=Domestication)) +
+  geom_text(label='a', x=1,y=0.725, size = 5) +
+  geom_text(label='ab', x=2,y=0.63, size = 5) +
+  geom_text(label='b', x=3,y=0.69, size = 5) +
+  geom_text(label='ab', x=4,y=0.65, size = 5) +
+  geom_text(label='ab', x=5,y=0.65, size = 5) +
+  geom_text(label='ab', x=6,y=0.66, size = 5) +
+  geom_text(label='ab', x=7,y=0.63, size = 5) +
+  geom_text(label='ab', x=8,y=0.64, size = 5) +
+  geom_text(label='ab', x=9,y=0.66, size = 5) +
+  geom_text(label='ab', x=10,y=0.65, size = 5) +
+  geom_text(label='ab', x=11,y=0.64, size = 5) +
+  geom_text(label='ab', x=12,y=0.64, size = 5) +
+  scale_fill_brewer(palette = 'Paired') +  
+  labs(y="P Decomposer Relative Abundance")+
+  theme(axis.text.x=element_text(size=14, colour = "black", angle =90 ), 
+        axis.text.y=element_text(size=14, colour = "black"),
+        axis.title=element_text(size=14,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        legend.key = element_blank(),
+        legend.text = element_text(size = 24),
+        strip.text.y = element_text(size=8, face="bold"), 
+        legend.title = element_blank(),
+       legend.position = 'none',
+        strip.text = element_blank(),
+        strip.background = element_blank(),
+       axis.title.x = element_blank());p.decompu
+
+```
+
+```{r}
+# P solubilizer
+
+sol.f <- psol.all %>% 
+  filter(.,Fertilization=='Fertilized')
+sol.u <- psol.all %>% 
+  filter(.,Fertilization=='Unfertilized')
+
+level_order3 <- factor(sol.f$Variety,level = c('LA0716', 'LA1580','LA1519', 'LA1698','Matchless','B Pink','Marglobe','Rutgers','Bobcat','Quali T','Line 1','Line 2'))
+p.solf <- ggplot(sol.f, aes(x=level_order3, y=Abundance)) +
+  geom_boxplot(aes(fill=Domestication)) +
+  geom_text(label='a', x=1,y=0.28, size = 5) +
+  geom_text(label='a', x=2,y=0.24, size = 5) +
+  geom_text(label='a', x=3,y=0.24, size = 5) +
+  geom_text(label='a', x=4,y=0.285, size = 5) +
+  geom_text(label='a', x=5,y=0.26, size = 5) +
+  geom_text(label='a', x=6,y=0.28, size = 5) +
+  geom_text(label='a', x=7,y=0.26, size = 5) +
+  geom_text(label='a', x=8,y=0.26, size = 5) +
+  geom_text(label='a', x=9,y=0.26, size = 5) +
+  geom_text(label='a', x=10,y=0.285, size = 5) +
+  geom_text(label='a', x=11,y=0.26, size = 5) +
+  geom_text(label='a', x=12,y=0.27, size = 5) +
+  scale_fill_brewer(palette = 'Paired') +  
+  labs(y="P Solubilizer Relative Abundance")+
+  theme(axis.text.x=element_text(size=14, colour = "black", angle =90 ), 
+        axis.text.y=element_text(size=14, colour = "black"),
+        axis.title=element_text(size=14,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        legend.key = element_blank(),
+        legend.text = element_text(size = 24),
+        strip.text.y = element_text(size=8, face="bold"), 
+        legend.title = element_blank(),
+       legend.position = 'none',
+        strip.text = element_blank(),
+        strip.background = element_blank(),
+       axis.title.x = element_blank());p.solf
+
+level_order4 <- factor(sol.u$Variety,level = c('LA0716', 'LA1580','LA1519', 'LA1698','Matchless','B Pink','Marglobe','Rutgers','Bobcat','Quali T','Line 1','Line 2'))
+p.solu <- ggplot(sol.u, aes(x=level_order4, y=Abundance)) +
+  geom_boxplot(aes(fill=Domestication)) +
+  geom_text(label='a', x=1,y=0.31, size = 5) +
+  geom_text(label='a', x=2,y=0.23, size = 5) +
+  geom_text(label='b', x=3,y=0.25, size = 5) +
+  geom_text(label='a', x=4,y=0.25, size = 5) +
+  geom_text(label='a', x=5,y=0.25, size = 5) +
+  geom_text(label='a', x=6,y=0.25, size = 5) +
+  geom_text(label='a', x=7,y=0.25, size = 5) +
+  geom_text(label='a', x=8,y=0.25, size = 5) +
+  geom_text(label='a', x=9,y=0.24, size = 5) +
+  geom_text(label='a', x=10,y=0.25, size = 5) +
+  geom_text(label='a', x=11,y=0.25, size = 5) +
+  geom_text(label='a', x=12,y=0.23, size = 5) +
+  scale_fill_brewer(palette = 'Paired') +  
+  labs(y="P Solubilizer Relative Abundance")+
+  theme(axis.text.x=element_text(size=14, colour = "black", angle =90 ), 
+        axis.text.y=element_text(size=14, colour = "black"),
+        axis.title=element_text(size=14,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        legend.key = element_blank(),
+        legend.text = element_text(size = 24),
+        strip.text.y = element_text(size=8, face="bold"), 
+        legend.title = element_blank(),
+       legend.position = 'none',
+        strip.text = element_blank(),
+        strip.background = element_blank(),
+       axis.title.x = element_blank());p.solu
+
+```
+
+```{r}
+p <- p.solu/p.decompu;p
+ggsave(plot=p, filename = 'Data/Outputs/Figures/Figure6.pdf', width = 14, height = 10)
+
+p<- p.decompf/p.solf;p
+ggsave(plot=p, filename = 'Data/Outputs/Figures/SuppFigure2.pdf', width = 14, height = 10)
+
+```
+
+
